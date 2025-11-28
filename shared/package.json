@@ -9,7 +9,9 @@
     "dev": "tsc --watch",
     "lint": "eslint . --ext .ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "prom-client": "^15.1.0"
+  },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "typescript": "^5.3.2"
