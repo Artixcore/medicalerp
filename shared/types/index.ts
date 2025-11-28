@@ -428,5 +428,9 @@ export enum IntegrationType {
   HL7 = 'hl7',
   FHIR = 'fhir',
   EDI = 'edi',
+  EPIC = 'epic',
+  CERNER = 'cerner',
+  ALLSCRIPTS = 'allscripts',
+  WEBHOOK = 'webhook',
 }
 

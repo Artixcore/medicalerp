@@ -1,0 +1,8 @@
+# Kong plugin metadata
+# This file helps Kong discover and load the plugin
+
+name: jwt-validator
+version: 1.0.0
+priority: 1000
+description: Validates JWT tokens issued by EHRMS User Service
+

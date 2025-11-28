@@ -6,6 +6,7 @@ import {
   IsArray,
   ValidateNested,
   IsNumber,
+  IsString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ContractStatus, Program } from '@shared/types';

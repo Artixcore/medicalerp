@@ -5,6 +5,7 @@ import {
   UseGuards,
   Post,
   Body,
+  Param,
 } from '@nestjs/common';
 import { AuditService } from './audit.service';
 import { AuditQueryDto } from './dto';
@@ -28,14 +29,14 @@ export class AuditController {
 
   @Get('resource/:resourceType/:resourceId')
   findByResource(
-    @Query('resourceType') resourceType: string,
-    @Query('resourceId') resourceId: string,
+    @Param('resourceType') resourceType: string,
+    @Param('resourceId') resourceId: string,
   ) {
     return this.auditService.findByResource(resourceType, resourceId);
   }
 
   @Get('user/:userId')
-  findByUser(@Query('userId') userId: string) {
+  findByUser(@Param('userId') userId: string) {
     return this.auditService.findByUser(userId);
   }
 }

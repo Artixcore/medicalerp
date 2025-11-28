@@ -1,0 +1,37 @@
+# Example Kong configuration with JWT validation
+# Note: For production, use a custom JWT validator plugin or Kong's jwt plugin
+# configured to verify tokens from your auth service
+
+_format_version: "3.0"
+_transform: true
+
+# For services requiring authentication, use one of these approaches:
+# 1. Custom JWT validator plugin (recommended)
+# 2. Kong's jwt plugin with proper configuration
+# 3. Forward Authorization header and let backend validate
+
+services:
+  - name: example-service
+    url: http://example-service:3000
+    routes:
+      - name: example-routes
+        paths:
+          - /api/v1/example
+    plugins:
+      # Option 1: Custom plugin (requires plugin installation)
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET}
+      
+      # Option 2: Kong JWT plugin (requires consumer/jwt setup)
+      # - name: jwt
+      #   config:
+      #     secret_is_base64: false
+      #     run_on_preflight: true
+      
+      # Option 3: Simple header check (less secure, backend validates)
+      - name: pre-function
+        config:
+          access:
+            - "local token = ngx.req.get_headers()['authorization']\nif not token or not string.match(token, '^Bearer ') then\n  ngx.status = 401\n  ngx.say('{\"message\": \"Unauthorized\"}')\n  ngx.exit(401)\nend"
+

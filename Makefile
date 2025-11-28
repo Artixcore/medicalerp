@@ -31,6 +31,15 @@ docker-up: ## Start infrastructure services
 docker-down: ## Stop infrastructure services
 	docker-compose down
 
+kong-setup: ## Setup Kong API Gateway
+	./scripts/setup-kong.sh
+
+kong-status: ## Check Kong API Gateway status
+	@curl -s http://localhost:8001/status | python -m json.tool || echo "Kong is not running"
+
+kong-logs: ## View Kong logs
+	docker logs -f ehrms-kong
+
 clean: ## Clean build artifacts
 	rm -rf node_modules
 	rm -rf dist

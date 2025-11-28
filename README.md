@@ -48,8 +48,18 @@ This system implements a microservices architecture with the following component
 1. Clone the repository
 2. Install dependencies: `npm install`
 3. Start infrastructure: `docker-compose up -d`
-4. Run migrations: `npm run migrate`
-5. Start services: `npm run dev`
+4. Setup API Gateway: `./scripts/setup-kong.sh` or `docker-compose up -d kong-database kong-migrations kong`
+5. Run migrations: `npm run migrate`
+6. Start services: `npm run dev`
+
+### API Gateway
+
+The system uses Kong as the API Gateway. Access points:
+- **API Proxy:** http://localhost:8000
+- **Admin API:** http://localhost:8001
+- **Admin GUI:** http://localhost:8002
+
+All API requests should go through the gateway at `http://localhost:8000/api/v1/*`
 
 ## Project Structure
 

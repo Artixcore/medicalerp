@@ -40,3 +40,32 @@ variable "redis_node_type" {
   default     = "cache.t3.micro"
 }
 
+# Cloudflare Configuration Variables
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token with DNS and SSL permissions"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare Zone ID for the domain"
+  type        = string
+}
+
+variable "cloudflare_domain" {
+  description = "Domain name managed by Cloudflare (e.g., example.com)"
+  type        = string
+}
+
+variable "cloudflare_cert_validity_days" {
+  description = "Validity period for Cloudflare Origin Certificate in days"
+  type        = number
+  default     = 5475 # 15 years (maximum)
+}
+
+variable "cloudflare_enable_www" {
+  description = "Enable www subdomain CNAME record"
+  type        = bool
+  default     = false
+}
+

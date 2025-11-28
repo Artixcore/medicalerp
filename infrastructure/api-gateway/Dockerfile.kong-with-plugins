@@ -1,0 +1,54 @@
+FROM kong:3.4
+
+# Install lua-resty-jwt for JWT validation
+USER root
+
+# Install dependencies for building lua-resty-jwt
+RUN apk add --no-cache git unzip
+
+# Install lua-resty-jwt for JWT validation
+# Check if it's already available, if not install it
+RUN if [ ! -d "/usr/local/share/lua/5.1/resty/jwt" ]; then \
+      cd /tmp && \
+      apk add --no-cache git unzip && \
+      git clone https://github.com/cdbattags/lua-resty-jwt.git && \
+      mkdir -p /usr/local/share/lua/5.1/resty && \
+      cp -r lua-resty-jwt/lib/resty/* /usr/local/share/lua/5.1/resty/ && \
+      rm -rf lua-resty-jwt; \
+    fi
+
+# Copy custom plugins
+# Kong plugins must be in /usr/local/share/lua/5.1/kong/plugins/<plugin-name>/
+RUN mkdir -p /usr/local/share/lua/5.1/kong/plugins
+COPY plugins/jwt-validator/ /usr/local/share/lua/5.1/kong/plugins/jwt-validator/
+
+# Create SSL certificate directory for Cloudflare Origin Certificate
+RUN mkdir -p /usr/local/kong/ssl
+
+# Copy Kong configuration
+COPY kong.conf /etc/kong/kong.conf
+
+# Copy declarative configuration
+COPY kong.yml /kong/kong.yml
+
+# Note: Cloudflare Origin Certificate and private key should be mounted as volumes
+# or provided via environment variables and copied during container startup
+# Expected paths:
+# - /usr/local/kong/ssl/cloudflare-origin.crt
+# - /usr/local/kong/ssl/cloudflare-origin.key
+
+# Set environment variable for declarative config
+ENV KONG_DECLARATIVE_CONFIG=/kong/kong.yml
+ENV KONG_PLUGINS=bundled,jwt-validator
+
+# Expose ports
+EXPOSE 8000 8443 8001 8444 8002
+
+# Switch back to kong user
+USER kong
+
+# Use Kong's default entrypoint
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["kong", "docker-start"]
+

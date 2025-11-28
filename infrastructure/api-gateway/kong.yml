@@ -1,0 +1,556 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  # User Management Service
+  - name: user-service
+    url: http://user-service:3001
+    routes:
+      - name: user-service-auth-routes
+        strip_path: false
+        paths:
+          - /api/v1/auth
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+    plugins:
+      - name: jwt-validator
+        config:
+          skip_validation: true
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+  - name: user-service-protected
+    url: http://user-service:3001
+    routes:
+      - name: user-service-protected-routes
+        strip_path: false
+        paths:
+          - /api/v1/users
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Client Management Service
+  - name: client-service
+    url: http://client-service:3002
+    routes:
+      - name: client-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/clients
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Case Management Service
+  - name: case-service
+    url: http://case-service:3003
+    routes:
+      - name: case-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/cases
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Scheduling Service
+  - name: scheduling-service
+    url: http://scheduling-service:3004
+    routes:
+      - name: scheduling-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/appointments
+          - /api/v1/beds
+          - /api/v1/bed-assignments
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Billing Service
+  - name: billing-service
+    url: http://billing-service:3005
+    routes:
+      - name: billing-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/claims
+          - /api/v1/payments
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Provider Management Service
+  - name: provider-service
+    url: http://provider-service:3006
+    routes:
+      - name: provider-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/providers
+          - /api/v1/contracts
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Document Management Service
+  - name: document-service
+    url: http://document-service:3007
+    routes:
+      - name: document-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/documents
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 50
+          hour: 500
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Reporting Service
+  - name: reporting-service
+    url: http://reporting-service:3008
+    routes:
+      - name: reporting-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/reports
+          - /api/v1/analytics
+        methods:
+          - GET
+          - POST
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 50
+          hour: 500
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Integration Service
+  - name: integration-service
+    url: http://integration-service:3009
+    routes:
+      - name: integration-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/integrations
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - PUT
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 50
+          hour: 500
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Notification Service
+  - name: notification-service
+    url: http://notification-service:3010
+    routes:
+      - name: notification-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/notifications
+        methods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  # Audit Service
+  - name: audit-service
+    url: http://audit-service:3011
+    routes:
+      - name: audit-service-routes
+        strip_path: false
+        paths:
+          - /api/v1/audit-logs
+        methods:
+          - GET
+          - POST
+    plugins:
+      - name: jwt-validator
+        config:
+          secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: rate-limiting
+        config:
+          minute: 50
+          hour: 500
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - POST
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+# Global plugins
+plugins:
+  - name: request-id
+    config:
+      header_name: X-Request-ID
+      echo_downstream: true
+  - name: correlation-id
+    config:
+      header_name: X-Correlation-ID
+      echo_downstream: true
+      generator: uuid
+

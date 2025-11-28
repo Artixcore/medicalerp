@@ -4,6 +4,7 @@ import { Repository, Between } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
 import { NotFoundError, ConflictError } from '@shared/common/errors';
 import { CreateAppointmentDto, UpdateAppointmentDto } from './dto';
+import { AppointmentStatus } from '@shared/types';
 
 @Injectable()
 export class AppointmentService {
