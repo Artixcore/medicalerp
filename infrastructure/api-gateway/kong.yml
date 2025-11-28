@@ -62,6 +62,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 300
+          cache_ttl: 300
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 100
@@ -108,6 +127,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 300
+          cache_ttl: 300
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 100
@@ -154,6 +192,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 180
+          cache_ttl: 180
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 100
@@ -202,6 +259,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 180
+          cache_ttl: 180
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 100
@@ -249,6 +325,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 300
+          cache_ttl: 300
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 100
@@ -296,6 +391,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 1800
+          cache_ttl: 1800
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 100
@@ -342,6 +456,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 300
+          cache_ttl: 300
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 50
@@ -386,6 +519,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 900
+          cache_ttl: 900
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 50
@@ -429,6 +581,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 300
+          cache_ttl: 300
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 50
@@ -474,6 +645,25 @@ services:
       - name: jwt-validator
         config:
           secret: ${JWT_SECRET:-dev-secret-change-in-production}
+      - name: proxy-cache
+        config:
+          storage_ttl: 60
+          cache_ttl: 60
+          content_type:
+            - "application/json"
+          request_method:
+            - GET
+          response_code:
+            - 200
+            - 301
+            - 404
+          storage: redis
+          redis:
+            host: redis
+            port: 6379
+            timeout: 2000
+            password: null
+            database: 1
       - name: rate-limiting
         config:
           minute: 100

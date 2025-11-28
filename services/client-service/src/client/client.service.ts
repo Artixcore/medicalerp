@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, Like } from 'typeorm';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Client } from './entities/client.entity';
 import { NotFoundError, ConflictError } from '@shared/common/errors';
 import { CreateClientDto, UpdateClientDto } from './dto';
@@ -10,6 +12,7 @@ export class ClientService {
   constructor(
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createClientDto: CreateClientDto): Promise<Client> {
@@ -26,7 +29,12 @@ export class ClientService {
     }
 
     const client = this.clientRepository.create(createClientDto);
-    return this.clientRepository.save(client);
+    const savedClient = await this.clientRepository.save(client);
+    
+    // Invalidate cache
+    await this.cacheManager.del('clients:list');
+    
+    return savedClient;
   }
 
   async findAll(
@@ -86,12 +94,22 @@ export class ClientService {
     }
 
     Object.assign(client, updateClientDto);
-    return this.clientRepository.save(client);
+    const updatedClient = await this.clientRepository.save(client);
+    
+    // Invalidate cache
+    await this.cacheManager.del(`client:${id}`);
+    await this.cacheManager.del('clients:list');
+    
+    return updatedClient;
   }
 
   async remove(id: string): Promise<void> {
     const client = await this.findOne(id);
     await this.clientRepository.remove(client);
+    
+    // Invalidate cache
+    await this.cacheManager.del(`client:${id}`);
+    await this.cacheManager.del('clients:list');
   }
 
   private async generateClientNumber(): Promise<string> {

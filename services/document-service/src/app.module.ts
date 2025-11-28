@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@shared/common/cache';
 import { DocumentModule } from './document/document.module';
 
 @Module({
@@ -9,6 +10,7 @@ import { DocumentModule } from './document/document.module';
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
+    CacheModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',

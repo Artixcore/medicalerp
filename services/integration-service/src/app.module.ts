@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from '@shared/common/cache';
 import { IntegrationModule } from './integration/integration.module';
 
 @Module({
@@ -11,6 +12,7 @@ import { IntegrationModule } from './integration/integration.module';
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
+    CacheModule,
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({

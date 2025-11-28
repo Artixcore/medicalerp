@@ -29,3 +29,7 @@ export const RATE_LIMIT_MAX_REQUESTS = 100;
 export const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
 export const HASH_ALGORITHM = 'sha256';
 
+// Cache configuration
+export const CACHE_DEFAULT_TTL = 300; // 5 minutes in seconds
+export const CACHE_REDIS_DB = 0;
+

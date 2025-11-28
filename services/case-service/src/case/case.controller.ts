@@ -8,13 +8,16 @@ import {
   Delete,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CaseService } from './case.service';
 import { CreateCaseDto, UpdateCaseDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CacheInterceptor, Cacheable, CACHE_TTL } from '@shared/common/cache';
 
 @Controller('cases')
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(CacheInterceptor)
 export class CaseController {
   constructor(private readonly caseService: CaseService) {}
 
@@ -24,6 +27,7 @@ export class CaseController {
   }
 
   @Get()
+  @Cacheable({ ttl: CACHE_TTL.CASE, key: 'cases:list' })
   findAll(
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
@@ -41,11 +45,13 @@ export class CaseController {
   }
 
   @Get('client/:clientId')
+  @Cacheable({ ttl: CACHE_TTL.CASE, key: 'cases:client' })
   findByClientId(@Param('clientId') clientId: string) {
     return this.caseService.findByClientId(clientId);
   }
 
   @Get(':id')
+  @Cacheable({ ttl: CACHE_TTL.CASE, key: 'case' })
   findOne(@Param('id') id: string) {
     return this.caseService.findOne(id);
   }

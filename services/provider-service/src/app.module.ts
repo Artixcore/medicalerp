@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@shared/common/cache';
 import { ProviderModule } from './provider/provider.module';
 import { ContractModule } from './contract/contract.module';
 
@@ -10,6 +11,7 @@ import { ContractModule } from './contract/contract.module';
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
+    CacheModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',

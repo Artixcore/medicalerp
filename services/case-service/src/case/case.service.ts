@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, Like } from 'typeorm';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Case } from './entities/case.entity';
 import { NotFoundError, ConflictError } from '@shared/common/errors';
 import { CreateCaseDto, UpdateCaseDto } from './dto';
@@ -10,6 +12,7 @@ export class CaseService {
   constructor(
     @InjectRepository(Case)
     private readonly caseRepository: Repository<Case>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createCaseDto: CreateCaseDto): Promise<Case> {
@@ -31,7 +34,13 @@ export class CaseService {
         ? new Date(createCaseDto.closedDate)
         : undefined,
     });
-    return this.caseRepository.save(caseEntity);
+    const savedCase = await this.caseRepository.save(caseEntity);
+    
+    // Invalidate cache
+    await this.cacheManager.del('cases:list');
+    await this.cacheManager.del(`cases:client:${savedCase.clientId}`);
+    
+    return savedCase;
   }
 
   async findAll(

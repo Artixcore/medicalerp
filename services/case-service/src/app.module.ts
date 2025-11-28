@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@shared/common/cache';
 import { CaseModule } from './case/case.module';
 import { CaseNoteModule } from './case-note/case-note.module';
 import { ServicePlanModule } from './service-plan/service-plan.module';
@@ -11,6 +12,7 @@ import { ServicePlanModule } from './service-plan/service-plan.module';
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
+    CacheModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
