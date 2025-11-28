@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@shared/common/cache';
+import { MetricsModule } from '@shared/common/metrics';
 import { IntegrationModule } from './integration/integration.module';
 
 @Module({
@@ -13,6 +14,7 @@ import { IntegrationModule } from './integration/integration.module';
       envFilePath: ['.env.local', '.env'],
     }),
     CacheModule,
+    MetricsModule,
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({

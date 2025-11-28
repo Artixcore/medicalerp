@@ -29,6 +29,8 @@ This will start:
 - Redis on port 6379
 - MongoDB on port 27017
 - RabbitMQ on port 5672 (management UI on 15672)
+- Kong API Gateway on port 8000 (Admin API on 8001)
+- Prometheus on port 9090
 
 ### 3. Run Database Migrations
 
@@ -161,8 +163,86 @@ Expected response:
 
 ## Monitoring
 
+### Prometheus Metrics
+
+All microservices expose Prometheus metrics at `/api/v1/metrics` endpoint. The Kong API Gateway also exposes metrics at `/metrics` (via Admin API on port 8001).
+
+#### Accessing Prometheus
+
+Prometheus server is available at:
+- **Prometheus UI:** http://localhost:9090
+- **Metrics Endpoint:** http://localhost:9090/metrics
+
+#### Service Metrics Endpoints
+
+Each microservice exposes metrics at:
+- User Service: http://localhost:3001/api/v1/metrics
+- Client Service: http://localhost:3002/api/v1/metrics
+- Case Service: http://localhost:3003/api/v1/metrics
+- Scheduling Service: http://localhost:3004/api/v1/metrics
+- Billing Service: http://localhost:3005/api/v1/metrics
+- Provider Service: http://localhost:3006/api/v1/metrics
+- Document Service: http://localhost:3007/api/v1/metrics
+- Reporting Service: http://localhost:3008/api/v1/metrics
+- Integration Service: http://localhost:3009/api/v1/metrics
+- Notification Service: http://localhost:3010/api/v1/metrics
+- Audit Service: http://localhost:3011/api/v1/metrics
+- Kong Gateway: http://localhost:8001/metrics
+
+#### Available Metrics
+
+**HTTP Request Metrics:**
+- `http_requests_total` - Total number of HTTP requests (labels: method, route, status_code, service)
+- `http_request_duration_seconds` - Request duration histogram (labels: method, route, status_code, service)
+- `http_request_size_bytes` - Request body size histogram (labels: method, route, service)
+- `http_response_size_bytes` - Response body size histogram (labels: method, route, status_code, service)
+
+**Application Metrics:**
+- `app_info` - Application information (labels: service, version)
+- `app_up` - Service health indicator (1 = up, 0 = down) (labels: service)
+
+**System Metrics:**
+- Default Node.js metrics (CPU, memory, event loop, etc.) via prom-client
+
+**Kong Gateway Metrics:**
+- Request counts, latency, bandwidth, upstream health metrics
+
+#### Example Prometheus Queries
+
+```promql
+# Total requests per service
+sum(rate(http_requests_total[5m])) by (service)
+
+# Request duration by service (95th percentile)
+histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))
+
+# Error rate by service
+sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)
+
+# Service availability
+app_up
+
+# Average request size by service
+avg(http_request_size_bytes) by (service)
+```
+
+#### Prometheus Configuration
+
+Prometheus configuration is located at `infrastructure/prometheus/prometheus.yml`. It includes:
+- Scrape interval: 15 seconds
+- Evaluation interval: 15 seconds
+- Data retention: 15 days
+- Scrape configs for all services and Kong
+
+To reload Prometheus configuration without restart:
+```bash
+curl -X POST http://localhost:9090/-/reload
+```
+
+### Other Monitoring Tools
+
 - **Logs:** Centralized logging via ELK Stack
-- **Metrics:** Prometheus + Grafana
+- **Grafana:** Connect Grafana to Prometheus for visualization
 - **APM:** Application Performance Monitoring via Datadog/New Relic
 
 ## Backup and Recovery

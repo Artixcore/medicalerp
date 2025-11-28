@@ -1,0 +1,89 @@
+# Prometheus Configuration
+# This file configures Prometheus to scrape metrics from all microservices
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'ehrms'
+    environment: 'development'
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # User Service
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['user-service:3001']
+    metrics_path: '/api/v1/metrics'
+
+  # Client Service
+  - job_name: 'client-service'
+    static_configs:
+      - targets: ['client-service:3002']
+    metrics_path: '/api/v1/metrics'
+
+  # Case Service
+  - job_name: 'case-service'
+    static_configs:
+      - targets: ['case-service:3003']
+    metrics_path: '/api/v1/metrics'
+
+  # Scheduling Service
+  - job_name: 'scheduling-service'
+    static_configs:
+      - targets: ['scheduling-service:3004']
+    metrics_path: '/api/v1/metrics'
+
+  # Billing Service
+  - job_name: 'billing-service'
+    static_configs:
+      - targets: ['billing-service:3005']
+    metrics_path: '/api/v1/metrics'
+
+  # Provider Service
+  - job_name: 'provider-service'
+    static_configs:
+      - targets: ['provider-service:3006']
+    metrics_path: '/api/v1/metrics'
+
+  # Document Service
+  - job_name: 'document-service'
+    static_configs:
+      - targets: ['document-service:3007']
+    metrics_path: '/api/v1/metrics'
+
+  # Reporting Service
+  - job_name: 'reporting-service'
+    static_configs:
+      - targets: ['reporting-service:3008']
+    metrics_path: '/api/v1/metrics'
+
+  # Integration Service
+  - job_name: 'integration-service'
+    static_configs:
+      - targets: ['integration-service:3009']
+    metrics_path: '/api/v1/metrics'
+
+  # Notification Service
+  - job_name: 'notification-service'
+    static_configs:
+      - targets: ['notification-service:3010']
+    metrics_path: '/api/v1/metrics'
+
+  # Audit Service
+  - job_name: 'audit-service'
+    static_configs:
+      - targets: ['audit-service:3011']
+    metrics_path: '/api/v1/metrics'
+
+  # Kong API Gateway
+  - job_name: 'kong'
+    static_configs:
+      - targets: ['kong:8001']
+    metrics_path: '/metrics'
+

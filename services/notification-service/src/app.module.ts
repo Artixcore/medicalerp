@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@shared/common/cache';
+import { MetricsModule } from '@shared/common/metrics';
 import { NotificationModule } from './notification/notification.module';
 
 @Module({
@@ -10,6 +11,7 @@ import { NotificationModule } from './notification/notification.module';
       envFilePath: ['.env.local', '.env'],
     }),
     CacheModule,
+    MetricsModule,
     NotificationModule,
   ],
 })
