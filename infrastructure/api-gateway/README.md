@@ -7,6 +7,7 @@ This directory contains the configuration for the Kong API Gateway, which serves
 Kong provides:
 - **Request Routing:** Routes requests to appropriate backend services
 - **JWT Authentication:** Full JWT token validation at gateway level
+- **Request Caching:** HTTP response caching using Redis backend
 - **Rate Limiting:** Prevents API abuse
 - **CORS:** Cross-Origin Resource Sharing configuration
 - **Request/Response Transformation:** Header manipulation and request ID tracking
@@ -23,6 +24,7 @@ Kong API Gateway (Port 8000)
     │   ├── Verify signature
     │   ├── Check expiration
     │   └── Add user headers
+    ├── Proxy Cache (Redis)
     ├── Rate Limiting
     ├── CORS Headers
     └── Route to Backend Service
@@ -68,7 +70,7 @@ curl http://localhost:8001/plugins/enabled | grep jwt-validator
 Declarative configuration file defining:
 - Services and their upstream URLs
 - Routes and path matching
-- Plugins (JWT validator, rate limiting, CORS)
+- Plugins (JWT validator, proxy-cache, rate limiting, CORS)
 - Global plugins
 
 ### kong.conf
@@ -148,6 +150,79 @@ Rate limit headers are included in responses:
 - `X-RateLimit-Limit` - Maximum requests allowed
 - `X-RateLimit-Remaining` - Remaining requests
 - `X-RateLimit-Reset` - Time when limit resets
+
+## Request Caching
+
+Kong uses the proxy-cache plugin with Redis backend to cache HTTP responses, reducing load on backend services and improving response times.
+
+### Cache Configuration
+
+Caching is configured per service with different TTLs based on data volatility:
+
+| Service Type | Cache TTL | Description |
+|-------------|-----------|-------------|
+| User/Client Data | 5 minutes | Standard entity data |
+| Case/Appointment Data | 3 minutes | More dynamic data |
+| Reports/Analytics | 15 minutes | Computed reports |
+| Provider/Contract Data | 30 minutes | Reference data |
+| Notifications | 1 minute | Time-sensitive data |
+
+### Cache Behavior
+
+- **Cached Methods:** Only GET requests are cached
+- **Cache Key:** Generated from request path, query parameters, and user context
+- **Cache Storage:** Redis (shared across all Kong instances)
+- **Cache Invalidation:** Automatic expiration based on TTL
+- **Excluded Endpoints:** Authentication endpoints (`/api/v1/auth`) are not cached
+
+### Cache Headers
+
+Kong adds standard HTTP cache headers to responses:
+- `X-Cache-Status` - Indicates cache hit (`HIT`) or miss (`MISS`)
+- `X-Cache-Key` - The cache key used for this request
+
+### Cache Invalidation
+
+Cache invalidation happens automatically:
+1. **TTL Expiration:** Cached entries expire after their configured TTL
+2. **Service-Level Invalidation:** Backend services invalidate cache on mutations (POST/PATCH/DELETE)
+3. **Manual Invalidation:** Use Kong Admin API to clear cache if needed
+
+### Manual Cache Management
+
+Clear cache via Kong Admin API:
+
+```bash
+# Clear all cache for a service
+curl -X POST http://localhost:8001/services/{service-name}/plugins/{plugin-id}/cache/clear
+
+# Check cache status
+curl http://localhost:8001/services/{service-name}/plugins/{plugin-id}
+```
+
+### Cache Monitoring
+
+Monitor cache performance:
+- Check `X-Cache-Status` header in responses
+- Monitor Redis memory usage
+- Review Kong access logs for cache hit rates
+
+### Troubleshooting Cache Issues
+
+**Cache not working:**
+1. Verify Redis is running and accessible: `docker ps | grep redis`
+2. Check Kong logs for cache plugin errors: `docker logs ehrms-kong | grep cache`
+3. Verify proxy-cache plugin is enabled: `curl http://localhost:8001/plugins/enabled | grep proxy-cache`
+
+**Stale data:**
+1. Check TTL configuration in `kong.yml`
+2. Verify cache invalidation is working in backend services
+3. Manually clear cache using Admin API if needed
+
+**High memory usage:**
+1. Review cache TTLs - reduce if too long
+2. Monitor Redis memory: `docker exec ehrms-redis redis-cli INFO memory`
+3. Consider Redis eviction policies for production
 
 ## Local Development
 

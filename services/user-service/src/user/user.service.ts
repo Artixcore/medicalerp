@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { Role } from '@shared/types';
@@ -12,6 +14,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -29,7 +32,12 @@ export class UserService {
       passwordHash,
     });
 
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+    
+    // Invalidate cache
+    await this.cacheManager.del('users:list');
+    
+    return savedUser;
   }
 
   async findAll(): Promise<User[]> {
@@ -74,12 +82,22 @@ export class UserService {
     }
 
     Object.assign(user, updateUserDto);
-    return this.userRepository.save(user);
+    const updatedUser = await this.userRepository.save(user);
+    
+    // Invalidate cache
+    await this.cacheManager.del(`user:${id}`);
+    await this.cacheManager.del('users:list');
+    
+    return updatedUser;
   }
 
   async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
     await this.userRepository.remove(user);
+    
+    // Invalidate cache
+    await this.cacheManager.del(`user:${id}`);
+    await this.cacheManager.del('users:list');
   }
 
   async validatePassword(user: User, password: string): Promise<boolean> {

@@ -20,6 +20,7 @@ The Electronic Health Records Management System (EHRMS) is built using a microse
         ┌─────────────────▼─────────────────┐
         │      API Gateway (Kong)           │
         │  - Authentication                 │
+        │  - Request Caching (Redis)        │
         │  - Rate Limiting                  │
         │  - Request Routing                │
         └─────────────────┬─────────────────┘
@@ -59,7 +60,8 @@ The Electronic Health Records Management System (EHRMS) is built using a microse
         │      Data Layer                  │
         │  ┌──────────┐  ┌──────────┐      │
         │  │PostgreSQL│  │  Redis   │      │
-        │  │ (Primary) │  │ (Cache)  │      │
+        │  │ (Primary) │  │ (Cache & │      │
+        │  │           │  │  Session)│      │
         │  └──────────┘  └──────────┘      │
         │  ┌──────────┐                    │
         │  │ MongoDB │                    │
@@ -129,12 +131,37 @@ The Electronic Health Records Management System (EHRMS) is built using a microse
 
 - **Backend Framework:** NestJS (Node.js/TypeScript)
 - **Database:** PostgreSQL 14+
-- **Cache:** Redis 7+
+- **Cache:** Redis 7+ (used for both API Gateway and service-level caching)
 - **Document Store:** MongoDB 6+
 - **Message Queue:** RabbitMQ
-- **API Gateway:** Kong
+- **API Gateway:** Kong (with proxy-cache plugin)
 - **Containerization:** Docker + Kubernetes
 - **Cloud:** AWS GovCloud / Azure Government
+
+## Caching Architecture
+
+The system implements a two-tier caching strategy:
+
+### 1. API Gateway Caching (Kong)
+- **Location:** Kong proxy-cache plugin
+- **Storage:** Redis
+- **Scope:** HTTP responses for GET requests
+- **TTL:** Varies by service type (1-30 minutes)
+- **Benefits:** Reduces load on backend services, improves response times
+
+### 2. Service-Level Caching (NestJS)
+- **Location:** Individual microservices
+- **Storage:** Redis (shared instance)
+- **Scope:** Database queries and service responses
+- **TTL:** Configurable per endpoint (default 5 minutes)
+- **Benefits:** Reduces database load, improves query performance
+- **Invalidation:** Automatic on mutations (POST/PATCH/DELETE)
+
+### Cache Invalidation Strategy
+- **Automatic:** Cache entries expire based on TTL
+- **On Mutations:** Services invalidate related cache keys when data changes
+- **Pattern-Based:** Supports pattern-based invalidation for related data
+- **User-Specific:** Cache keys include user context for user-specific data
 
 ## Security Architecture
 

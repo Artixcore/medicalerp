@@ -77,6 +77,21 @@ export class CacheInterceptor implements NestInterceptor {
   ): string {
     if (customKey) {
       let key = customKey;
+      
+      // Extract ID from URL if present (e.g., /users/:id -> users:123)
+      const idMatch = url.match(/\/([^/]+)\/([^/?]+)$/);
+      if (idMatch && !url.includes('?')) {
+        const resource = idMatch[1];
+        const id = idMatch[2];
+        key = `${resource}:${id}`;
+      } else if (idMatch && url.includes('?')) {
+        // Handle cases like /cases/client/:clientId
+        const parts = url.split('?')[0].split('/');
+        const resource = parts[parts.length - 2];
+        const id = parts[parts.length - 1];
+        key = `${resource}:${id}`;
+      }
+      
       if (includeUser && user?.id) {
         key += `:user:${user.id}`;
       }
@@ -88,7 +103,7 @@ export class CacheInterceptor implements NestInterceptor {
     }
 
     // Default key generation
-    let key = url;
+    let key = url.split('?')[0]; // Remove query string for key
     if (includeUser && user?.id) {
       key += `:user:${user.id}`;
     }
