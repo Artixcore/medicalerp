@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
@@ -14,9 +15,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@shared/types';
+import { CacheInterceptor, Cacheable, CACHE_TTL } from '@shared/common/cache';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(CacheInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -28,11 +31,13 @@ export class UserController {
 
   @Get()
   @Roles(Role.ADMIN, Role.SYSTEM_ADMIN)
+  @Cacheable({ ttl: CACHE_TTL.USER, key: 'users:list' })
   findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
+  @Cacheable({ ttl: CACHE_TTL.USER, key: 'user' })
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }

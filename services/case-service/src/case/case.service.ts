@@ -126,18 +126,36 @@ export class CaseService {
           ? null
           : caseEntity.closedDate,
     });
-    return this.caseRepository.save(caseEntity);
+    const updatedCase = await this.caseRepository.save(caseEntity);
+    
+    // Invalidate cache
+    await this.cacheManager.del(`case:${id}`);
+    await this.cacheManager.del('cases:list');
+    await this.cacheManager.del(`cases:client:${updatedCase.clientId}`);
+    
+    return updatedCase;
   }
 
   async remove(id: string): Promise<void> {
     const caseEntity = await this.findOne(id);
+    const clientId = caseEntity.clientId;
     await this.caseRepository.remove(caseEntity);
+    
+    // Invalidate cache
+    await this.cacheManager.del(`case:${id}`);
+    await this.cacheManager.del('cases:list');
+    await this.cacheManager.del(`cases:client:${clientId}`);
   }
 
   async linkCases(caseId: string, linkedCaseIds: string[]): Promise<Case> {
     const caseEntity = await this.findOne(caseId);
     caseEntity.linkedCases = linkedCaseIds;
-    return this.caseRepository.save(caseEntity);
+    const updatedCase = await this.caseRepository.save(caseEntity);
+    
+    // Invalidate cache
+    await this.cacheManager.del(`case:${caseId}`);
+    
+    return updatedCase;
   }
 
   private async generateCaseNumber(): Promise<string> {
