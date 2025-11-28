@@ -1,0 +1,18 @@
+{
+  "name": "@ehrms/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for EHRMS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2"
+  }
+}
+
